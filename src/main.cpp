@@ -76,6 +76,23 @@ public:
         }
     };
 
+    void drawSprite(int xPos,int yPos,char sprite[5][5]){
+        for (int y = yPos; y < yPos + 5; y++) {
+            for (int x = xPos; x < xPos + 5; x++) {
+                if (x < 0 || x >= WINDOW_WIDTH || y < 0 || y >= WINDOW_HEIGHT)
+                    continue;
+                
+                int index_x = x - xPos;
+                int index_y = y - yPos;
+
+                if (BUFFERSWAP)             
+                    BUFFER_BACK[x][y] = sprite[index_y][index_x];
+                else
+                    BUFFER_FRONT[x][y] = sprite[index_y][index_x];
+            }
+        }
+    };
+
     void buffer_clear(){
         for(int y=0; y<WINDOW_HEIGHT; y++){
             for(int x=0; x<WINDOW_WIDTH; x++){
@@ -115,8 +132,6 @@ public:
     int return_int_window_width(){ return WINDOW_WIDTH; };
     int return_int_window_height(){ return WINDOW_HEIGHT; };
 };
-
-
 
 class GameObject
 {
@@ -219,6 +234,9 @@ public:
         Collision player1_collision(&player_1, &HANDLE_WINDOW);
         Collision player2_collision(&player_2, &HANDLE_WINDOW);
 
+        float x=20;
+        bool forward = true;
+
         while(GAMEACTIVE){
 
             // Physics
@@ -238,7 +256,29 @@ public:
             HANDLE_WINDOW.drawBorder('#');
             HANDLE_WINDOW.draw(player_1.return_int_gameobject_xpos(),player_1.return_int_gameobject_ypos(),player_1.return_char_gameobject_sprite());
             HANDLE_WINDOW.draw(player_2.return_int_gameobject_xpos(),player_2.return_int_gameobject_ypos(),player_2.return_char_gameobject_sprite());
-            
+
+            char sprite[5][5] = {
+                {' ', '_', '_', '_', ' '},
+                {'|', 'o', ' ', 'o', '|'},
+                {'|', ' ', '_', ' ', '|'},
+                {' ', '|', '_', '|', ' '},
+                {' ', ' ', ' ', ' ', ' '}
+            };
+
+            if(forward){
+                if(x>80){
+                    forward = false;
+                }
+                HANDLE_WINDOW.drawSprite(x,3,sprite);
+                x = x+0.25f;
+            }else{
+                if(x<20){    
+                    forward = true;
+                }
+                HANDLE_WINDOW.drawSprite(x,3,sprite);
+                x = x-0.25f;
+            }
+
             HANDLE_WINDOW.buffer_swap();
             HANDLE_WINDOW.render();
         }
